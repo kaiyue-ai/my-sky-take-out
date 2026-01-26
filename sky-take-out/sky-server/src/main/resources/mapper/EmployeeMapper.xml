@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
 <mapper namespace="com.sky.mapper.EmployeeMapper">
+    <!--因为使用了插件所以不需要limit-->
+    <select id="pageQuery" resultType="com.sky.entity.Employee">
+        select * from sky_take_out.employee
+        <where>
+            <if test="name != null and name != ''">
+                and name like concat('%',#{name},'%')
+            </if>
+        </where>
+        order by create_time desc
+    </select>
 </mapper>
