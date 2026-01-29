@@ -1,0 +1,32 @@
+${AnsiColor.RED}         ^
+${AnsiColor.YELLOW}        /^\
+${AnsiColor.GREEN}       /^^^\
+${AnsiColor.CYAN}      /^^^^^\
+${AnsiColor.BLUE}     /^^^^^^^\
+${AnsiColor.MAGENTA}    /^^^^^^^^^\
+${AnsiColor.BRIGHT_RED}   /^^^^^^^^^^^\
+${AnsiColor.BRIGHT_YELLOW}    |   🚀   |
+${AnsiColor.BRIGHT_GREEN}    |         |
+${AnsiColor.BRIGHT_CYAN}    |         |
+${AnsiColor.BRIGHT_BLUE}    |         |
+${AnsiColor.BRIGHT_MAGENTA}    |         |
+${AnsiColor.BRIGHT_RED}    |         |
+${AnsiColor.BRIGHT_YELLOW}    |         |
+${AnsiColor.BRIGHT_GREEN}   /|         |\
+${AnsiColor.BRIGHT_CYAN}  /_|_________|_\
+${AnsiColor.BRIGHT_BLUE}     /       \
+${AnsiColor.BRIGHT_MAGENTA}    /         \
+${AnsiColor.BRIGHT_RED}   /           \
+${AnsiColor.BRIGHT_YELLOW}  |             |
+${AnsiColor.BRIGHT_GREEN}  |             |
+${AnsiColor.BRIGHT_RED}      🔥🔥🔥
+${AnsiColor.BRIGHT_YELLOW}    🔥🔥🔥🔥🔥
+${AnsiColor.BRIGHT_GREEN}   🔥🔥🔥🔥🔥🔥🔥
+${AnsiColor.BRIGHT_CYAN}  🔥🔥🔥🔥🔥🔥🔥🔥
+${AnsiColor.BRIGHT_BLUE}    🔥🔥🔥🔥🔥🔥🔥🔥
+${AnsiColor.BRIGHT_MAGENTA}    🔥🔥🔥🔥🔥🔥
+${AnsiColor.BRIGHT_RED}       🔥🔥🔥🔥🔥
+
+${AnsiColor.BRIGHT_CYAN}        🌈  System Launching...
+${AnsiColor.BRIGHT_MAGENTA}        ⚡  Spring Boot is Ready!
+
