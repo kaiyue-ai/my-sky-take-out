@@ -57,7 +57,7 @@ public class JwtTokenUserInterceptor implements HandlerInterceptor {
         } catch (Exception ex) {
             //4、不通过，响应401状态码
             response.setStatus(401);
-            // TODO 响应数据
+            // TODO 测试放行
             return true;
         }
     }
