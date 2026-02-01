@@ -139,6 +139,9 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
+    /**
+     * 根据分类id查询菜品数据
+     */
     public List<DishVO> listWithFlavors(Dish dish) {
         List<Dish> dishList = dishMapper.list(dish);
         List<DishVO> dishVOList = new ArrayList<>();

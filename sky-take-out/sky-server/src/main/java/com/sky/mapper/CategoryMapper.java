@@ -48,4 +48,12 @@ public interface CategoryMapper {
      * @return
      */
     Page<Category> pageQuery(Category build);
+
+    /**
+     * 根据id查询分类名称
+     * @param categoryId
+     * @return
+     */
+    @Select("select name from sky_take_out.category where id=#{categoryId}")
+    String getNameById(Long categoryId);
 }

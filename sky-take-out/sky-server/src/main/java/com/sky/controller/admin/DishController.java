@@ -1,7 +1,9 @@
 package com.sky.controller.admin;
 
+import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
@@ -30,7 +32,6 @@ public class DishController {
     private RedisTemplate redisTemplate;
     /**
      * 新增菜品
-     *
      * @param dishDTO
      * @return
      */
@@ -51,7 +52,29 @@ public class DishController {
         PageResult pageResult = dishService.pageQuery(dishPageQuery);
         return Result.success(pageResult);
     }
-
+    @GetMapping("/list")
+    @ApiOperation("根据分类id查询菜品")
+    public Result<List<DishVO>> list(Long categoryId){
+        log.info("根据分类id查询菜品：{}",categoryId);
+        //构造redis的key
+        String key="dish_"+categoryId;
+        //查询redis是否存在菜品数据
+        List<DishVO>  redisList = (List<DishVO>)redisTemplate.opsForValue().get(key);
+        //如果缓存中存在，则直接返回
+        if(redisList != null && redisList.size()>0){
+            log.info("缓存命中");
+            return Result.success(redisList);
+        } else {
+            Dish dish=new Dish();
+            dish.setCategoryId(categoryId);
+            dish.setStatus(StatusConstant.ENABLE);
+            List<DishVO> list=dishService.listWithFlavors(dish);
+            //将数据放到redis当中
+            redisTemplate.opsForValue().set(key,list);
+            return Result.success(list);
+        }
+        //缓存中没有，则查询数据库
+    }
     /**
      * 菜品批量删除
      * @param ids
@@ -107,6 +130,7 @@ public class DishController {
         cleanCache("dish_*");
         return Result.success();
     }
+
 
     //清理缓存的方法
     private void cleanCache(String Pattern){
