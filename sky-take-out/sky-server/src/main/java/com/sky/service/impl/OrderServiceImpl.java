@@ -1,8 +1,12 @@
 package com.sky.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.*;
@@ -10,13 +14,16 @@ import com.sky.exception.AddressBookBusinessException;
 import com.sky.exception.OrderBusinessException;
 import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
+import com.sky.result.PageResult;
 import com.sky.service.AddressBookService;
 import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.vo.OrderVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.xmlbeans.impl.soap.Detail;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -146,5 +153,85 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+    }
+
+    @Override
+    /**
+     * 查询订单详情
+     * @param id
+     * @return
+     */
+    public OrderVO getOrderDetail(Long id) {
+       Orders orders = orderMapper.getById(id);
+       OrderVO orderVO = new OrderVO();
+       BeanUtils.copyProperties(orders,orderVO);
+       List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(id);
+       orderVO.setOrderDetailList(orderDetailList);
+       return orderVO;
+    }
+
+    @Override
+    /**
+     * 取消订单
+     * @param id
+     */
+    public void cancel(Long id) {
+        Orders orders = new Orders();
+        orders.setId(id);
+        orders.setStatus(Orders.CANCELLED);
+        orderMapper.update(orders);
+    }
+
+    @Override
+    /**
+     * 获取历史订单信息
+     * @param ordersPageQueryDTO
+     * @return
+     */
+    public PageResult getHistoryOrders(OrdersPageQueryDTO ordersPageQueryDTO) {
+        PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
+        Orders orders = new Orders();
+        orders.setUserId(BaseContext.getCurrentId());
+        if(ordersPageQueryDTO.getStatus()!=null){
+            orders.setStatus(ordersPageQueryDTO.getStatus());
+        }
+        Page<Orders> page = orderMapper.list(orders);
+        //获取当前页数据
+        List<OrderVO> list = new ArrayList<>();
+        //获取订单明细
+        if (page != null && page.size() > 0) {
+            for (Orders order : page) {
+                OrderVO orderVO = new OrderVO();
+                BeanUtils.copyProperties(order, orderVO);
+                List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(order.getId());
+                orderVO.setOrderDetailList(orderDetailList);
+                list.add(orderVO);
+            }
+        }
+        return new PageResult(page.getTotal(), list);
+    }
+
+    /**
+     * 再来一单
+     * @param id
+     */
+    @Override
+    public void repetition(Long id) {
+        // 查询当前订单
+        Orders orders = orderMapper.getById(id);
+        // 查询当前订单的菜品数据
+        List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(id);
+        // 将订单数据插入到购物车
+        List<ShoppingCart> shoppingCartList = new ArrayList();
+        // 遍历订单菜品数据
+        for (OrderDetail orderDetail : orderDetailList) {
+            ShoppingCart shoppingCart = new ShoppingCart();
+            BeanUtils.copyProperties(orderDetail, shoppingCart);
+            shoppingCart.setUserId(BaseContext.getCurrentId());
+            shoppingCart.setCreateTime(LocalDateTime.now());
+            shoppingCartList.add(shoppingCart);
+        }
+        // 插入数据
+        shoppingCartMapper.insertBatch(shoppingCartList);
     }
 }

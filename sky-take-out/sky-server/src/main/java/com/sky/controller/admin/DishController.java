@@ -45,6 +45,11 @@ public class DishController {
         return Result.success();
     }
 
+    /**
+     * 菜品查询
+     * @param dishPageQuery
+     * @return
+     */
     @GetMapping("/page")
     @ApiOperation("分页查询")
     public Result<PageResult> page(DishPageQueryDTO dishPageQuery){
@@ -52,6 +57,11 @@ public class DishController {
         PageResult pageResult = dishService.pageQuery(dishPageQuery);
         return Result.success(pageResult);
     }
+    /**
+     * 根据分类id查询菜品
+     * @param categoryId
+     * @return
+     */
     @GetMapping("/list")
     @ApiOperation("根据分类id查询菜品")
     public Result<List<DishVO>> list(Long categoryId){

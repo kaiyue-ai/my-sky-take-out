@@ -7,6 +7,15 @@
         insert into shopping_cart (name, user_id, dish_id, setmeal_id, dish_flavor, number, amount, image, create_time)
         values (#{name}, #{userId}, #{dishId}, #{setmealId}, #{dishFlavor}, #{number}, #{amount}, #{image}, #{createTime})
     </insert>
+
+    <insert id="insertBatch">
+        insert into shopping_cart (name, image, user_id, dish_id, setmeal_id, dish_flavor, number, amount, create_time)
+        VALUES
+            <foreach collection="shoppingCartList" item="item" separator=",">
+                (#{item.name}, #{item.image}, #{item.userId}, #{item.dishId}, #{item.setmealId}, #{item.dishFlavor}, #{item.number}, #{item.amount}, #{item.createTime})
+            </foreach>
+    </insert>
+
     <select id="getByUserIdAndDishIdOrSetmealId" resultType="shoppingCart">
         select * from shopping_cart
         <where>
