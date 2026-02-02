@@ -75,7 +75,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         List<ShoppingCart> shoppingCarts = shoppingCartMapper.getByUserIdAndDishIdOrSetmealId(shoppingCart);
         return shoppingCarts;
     }
-
     /**
      * 清空购物车
      */
@@ -84,13 +83,19 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
+    /**
+     * 删除购物车数据
+     * @param shoppingCartDTO
+     */
     public void sub(ShoppingCartDTO shoppingCartDTO) {
         log.info("购物车数据：{}", shoppingCartDTO);
         ShoppingCart shoppingCart = new ShoppingCart();
         BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
+        shoppingCart.setUserId(BaseContext.getCurrentId());
         //获取当前购物车数据
         List<ShoppingCart> getCart = shoppingCartMapper.getByUserIdAndDishIdOrSetmealId(shoppingCart);
         ShoppingCart  shoppingCart1 = getCart.get(0);
+        shoppingCart1.setUserId(BaseContext.getCurrentId());
         if(shoppingCart1.getNumber()==1){
             //如果数量为1，将数据从数据库中删除
             Long id = getCart.get(0).getId();
