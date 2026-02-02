@@ -22,10 +22,10 @@ sky:
     # 退款成功回调 内网穿透临时域名+/notify/refundSuccess(Controller层接口)
     refundNotifyUrl:
   alioss:
-      endpoint:
-      access-key-id:
-      access-key-secret:
-      bucket-name:
+    endpoint:
+    access-key-id:
+    access-key-secret:
+    bucket-name:
   redis:
     host: 192.168.42.129
     port: 6379

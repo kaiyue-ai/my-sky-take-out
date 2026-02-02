@@ -6,9 +6,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
-import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.dto.OrdersPaymentDTO;
-import com.sky.dto.OrdersSubmitDTO;
+import com.sky.dto.*;
 import com.sky.entity.*;
 import com.sky.exception.AddressBookBusinessException;
 import com.sky.exception.OrderBusinessException;
@@ -19,6 +17,7 @@ import com.sky.service.AddressBookService;
 import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import lombok.extern.slf4j.Slf4j;
@@ -162,6 +161,7 @@ public class OrderServiceImpl implements OrderService {
      * @return
      */
     public OrderVO getOrderDetail(Long id) {
+        //根据id查询订单数据
        Orders orders = orderMapper.getById(id);
        OrderVO orderVO = new OrderVO();
        BeanUtils.copyProperties(orders,orderVO);
@@ -189,12 +189,16 @@ public class OrderServiceImpl implements OrderService {
      * @return
      */
     public PageResult getHistoryOrders(OrdersPageQueryDTO ordersPageQueryDTO) {
+        //设置当前用户id
+        ordersPageQueryDTO.setUserId(BaseContext.getCurrentId());
+        //开启分页
         PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
         Orders orders = new Orders();
         orders.setUserId(BaseContext.getCurrentId());
         if(ordersPageQueryDTO.getStatus()!=null){
             orders.setStatus(ordersPageQueryDTO.getStatus());
         }
+        //获取分页数据
         Page<Orders> page = orderMapper.list(orders);
         //获取当前页数据
         List<OrderVO> list = new ArrayList<>();
@@ -233,5 +237,97 @@ public class OrderServiceImpl implements OrderService {
         }
         // 插入数据
         shoppingCartMapper.insertBatch(shoppingCartList);
+    }
+
+    @Override
+    /**
+     * 搜索订单
+     * @param ordersPageQueryDTO
+     * @return
+     */
+    public PageResult conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO) {
+        PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
+        Page<Orders> page = orderMapper.pageQuery(ordersPageQueryDTO);
+        List<OrderVO> list = new ArrayList<>();
+        if (page != null && page.size() > 0) {
+            for (Orders orders : page) {
+                OrderVO orderVO = new OrderVO();
+                BeanUtils.copyProperties(orders, orderVO);
+                List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(orders.getId());
+                orderVO.setOrderDetailList(orderDetailList);
+                list.add(orderVO);
+            }
+        }
+        return new PageResult(page.getTotal(), list);
+    }
+
+    /**
+     * 统计订单数据
+     * @return
+     */
+    @Override
+    public OrderStatisticsVO statistics() {
+        OrderStatisticsVO orderStatisticsVO = new OrderStatisticsVO();
+        orderStatisticsVO.setToBeConfirmed(orderMapper.countStatus(Orders.TO_BE_CONFIRMED));
+        orderStatisticsVO.setConfirmed(orderMapper.countStatus(Orders.CONFIRMED));
+        orderStatisticsVO.setDeliveryInProgress(orderMapper.countStatus(Orders.DELIVERY_IN_PROGRESS));
+        return orderStatisticsVO;
+    }
+
+    @Override
+    /**
+     * 接单
+     * @param id
+     */
+    public void confirm(Long id) {
+        Orders orders = new Orders();
+        orders.setId(id);
+        orders.setStatus(Orders.CONFIRMED);
+        orderMapper.update(orders);
+    }
+
+    @Override
+    /**
+     * 拒单
+     * @param ordersRejectionDTO
+     */
+    public void rejection(OrdersRejectionDTO ordersRejectionDTO) {
+        Orders orders = orderMapper.getById(ordersRejectionDTO.getId());
+        orders.setRejectionReason(ordersRejectionDTO.getRejectionReason());
+        orders.setStatus(Orders.CANCELLED);
+        orderMapper.update(orders);
+    }
+
+    @Override
+    /**
+     * 管理员取消订单
+     * @param ordersCancelDTO
+     */
+    public void adminCancel(OrdersCancelDTO ordersCancelDTO) {
+        Orders orders = new Orders();
+        orders.setId(ordersCancelDTO.getId());
+        orders.setStatus(Orders.CANCELLED);
+        orders.setCancelReason(ordersCancelDTO.getCancelReason());
+        orderMapper.update(orders);
+    }
+
+    @Override
+    public void delivery(Long id) {
+        Orders orders = new Orders();
+        orders.setId(id);
+        orders.setStatus(Orders.DELIVERY_IN_PROGRESS);
+        orderMapper.update(orders);
+    }
+
+    @Override
+    /**
+     * 订单完成
+     * @param id
+     */
+    public void complete(Long id) {
+        Orders orders = new Orders();
+        orders.setId(id);
+        orders.setStatus(Orders.COMPLETED);
+        orderMapper.update(orders);
     }
 }
