@@ -31,7 +31,23 @@
         </set>
         where id = #{id}
     </update>
-
+        <update id="updateBatch">
+            <foreach collection="ordersList" item="o" separator=";">
+                update orders
+                <set>
+                <if test="o.status != null">
+                    ,status = #{o.status}
+                </if>
+                <if test="o.cancelReason != null">
+                    ,cancel_reason = #{o.cancelReason}
+                </if>
+                <if test="o.cancelTime != null">
+                    ,cancel_time = #{o.cancelTime}
+                </if>
+                where id = #{o.id}
+                </set>
+            </foreach>
+        </update>
     <select id="list" resultType="com.sky.entity.Orders">
     select * from orders
         <where>

@@ -405,4 +405,35 @@ public class OrderServiceImpl implements OrderService {
         orders.setStatus(Orders.COMPLETED);
         orderMapper.update(orders);
     }
+
+    @Override
+    public void processTimeoutOrder(Integer status, LocalDateTime time) {
+        List<Orders> ordersList = orderMapper.getByStatusAndOrderTime(status, time);
+        if (ordersList != null && ordersList.size() > 0) {
+            for (Orders orders : ordersList) {
+                // 取消订单
+                orders.setStatus(Orders.CANCELLED);
+                //取消原因
+                orders.setCancelReason("订单超时，自动取消");
+                // 取消时间
+                orders.setCancelTime(LocalDateTime.now());
+            }
+            // 批量更新
+            orderMapper.updateBatch(ordersList);
+        }
+    }
+
+    @Override
+    public void processDeliveryTimeoutOrder(Integer deliveryInProgress, LocalDateTime localDateTime) {
+        // 查询超时订单
+        List<Orders> ordersList = orderMapper.getByStatusAndOrderTime(deliveryInProgress, localDateTime);
+        if (ordersList != null && ordersList.size() > 0) {
+            for (Orders orders : ordersList) {
+                // 完成订单
+                orders.setStatus(Orders.COMPLETED);
+            }
+            // 批量更新
+            orderMapper.updateBatch(ordersList);
+        }
+    }
 }

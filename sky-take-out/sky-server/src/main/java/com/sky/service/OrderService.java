@@ -7,6 +7,8 @@ import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 
+import java.time.LocalDateTime;
+
 public interface OrderService {
 
     /**
@@ -96,4 +98,18 @@ public interface OrderService {
      * @param id
      */
     void complete(Long id);
+
+    /**
+     * 处理超时订单
+     * @param status
+     * @param time
+     */
+    void processTimeoutOrder(Integer status, LocalDateTime time);
+
+    /**
+     * 处理支付超时订单
+     * @param deliveryInProgress
+     * @param localDateTime
+     */
+    void processDeliveryTimeoutOrder(Integer deliveryInProgress, LocalDateTime localDateTime);
 }
