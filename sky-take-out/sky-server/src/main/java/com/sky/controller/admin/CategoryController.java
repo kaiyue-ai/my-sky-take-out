@@ -12,6 +12,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,6 +35,7 @@ public class CategoryController {
      */
     @PostMapping
     @ApiOperation("添加分类")
+    @CacheEvict(cacheNames = "category",allEntries = true)
     public Result add(@RequestBody CategoryDTO categoryDTO){
         log.info("添加分类{}",categoryDTO);
         categoryService.add(categoryDTO);
@@ -44,6 +47,7 @@ public class CategoryController {
      */
     @DeleteMapping
     @ApiOperation("删除分类")
+    @CacheEvict(cacheNames = "category",allEntries = true)
     public Result delete(Long id){
         log.info("删除分类{}",id);
         categoryService.delete(id);
@@ -56,6 +60,7 @@ public class CategoryController {
      */
     @PutMapping
     @ApiOperation("修改分类")
+    @CacheEvict(cacheNames = "category",allEntries = true)
     public Result update(@RequestBody CategoryDTO categoryDTO){
         log.info("修改分类{}",categoryDTO);
         categoryService.update(categoryDTO);
@@ -68,6 +73,7 @@ public class CategoryController {
      */
     @GetMapping("/list")
     @ApiOperation("分类查询")
+    @Cacheable(cacheNames = "category",key = "'type_'+#type")
     public Result<List<Category>> list(Integer type){
         log.info("分类查询{}",type);
         List<Category> list=categoryService.list(type);
@@ -81,6 +87,7 @@ public class CategoryController {
      */
     @PostMapping("/status/{status}")
     @ApiOperation("启用禁用分类")
+    @CacheEvict(cacheNames = "category",allEntries = true)
     public Result startOrStop(@PathVariable("status") Integer status,Long id){
         log.info("分类状态：{}，分类id：{}",status,id);
         categoryService.startOrStop(status,id);
@@ -93,6 +100,7 @@ public class CategoryController {
      */
     @GetMapping("/page")
     @ApiOperation("分类分页查询")
+    @Cacheable(cacheNames = "category",key = "'page_'+#categoryPageQueryDTO")
     public Result<PageResult> page(CategoryPageQueryDTO categoryPageQueryDTO){
         log.info("分页查询：{}", categoryPageQueryDTO);
         PageResult pageResult = categoryService.pageQuery(categoryPageQueryDTO);
