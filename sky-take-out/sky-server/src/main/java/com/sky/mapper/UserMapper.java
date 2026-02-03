@@ -5,6 +5,8 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.Map;
+
 @Mapper
 public interface UserMapper {
     /**
@@ -28,4 +30,20 @@ public interface UserMapper {
      */
     @Select("select * from sky_take_out.user where id = #{userId}")
     User getById(Long userId);
+
+    /**
+     * 根据日期统计用户数量
+     * @param map
+     * @return
+     */
+    @Select("select count(id) from sky_take_out.user where create_time <=  #{end}")
+    Integer countAllUserByDate(Map map);
+
+    /**
+     * 根据日期统计新增用户数量
+     * @param map
+     * @return
+     */
+    @Select("select count(id) from sky_take_out.user where create_time between #{begin} and #{end}")
+    Integer countNewUserByDate(Map map);
 }
