@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -342,6 +343,9 @@ public class OrderServiceImpl implements OrderService {
                 OrderVO orderVO = new OrderVO();
                 BeanUtils.copyProperties(orders, orderVO);
                 List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(orders.getId());
+                // 获取订单菜品
+                String dishes=orderDetailList.stream().map(orderDetail -> orderDetail.getName() + "*" + orderDetail.getNumber()).collect(Collectors.joining(","));
+                orderVO.setOrderDishes(dishes);
                 orderVO.setOrderDetailList(orderDetailList);
                 list.add(orderVO);
             }
