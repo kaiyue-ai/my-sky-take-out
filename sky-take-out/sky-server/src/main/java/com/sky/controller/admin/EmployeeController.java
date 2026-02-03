@@ -15,6 +15,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -75,12 +77,14 @@ public class EmployeeController {
      */
     @PostMapping("/logout")
     @ApiOperation("员工退出")
+    @CacheEvict(cacheNames = "employeeCache",allEntries = true)
     public Result<String> logout() {
         return Result.success();
     }
 
     @PostMapping
     @ApiOperation("新增员工")
+    @CacheEvict(cacheNames = "employeeCache",allEntries = true)
     public Result save(@RequestBody EmployeeDTO employeeDTO) {
         System.out.println("当前线程的id："+Thread.currentThread().getId());
         log.info("新增员工{}",employeeDTO);
@@ -95,6 +99,7 @@ public class EmployeeController {
      */
     @GetMapping("/page")
     @ApiOperation("员工分页查询")
+    @Cacheable(cacheNames = "employeeCache",key = "#employeePageQueryDTO.toString()")
     public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO){
         log.info("员工分页查询,请求参数为{}", employeePageQueryDTO);
         PageResult pageResult=employeeService.pageQuery(employeePageQueryDTO);
@@ -110,6 +115,7 @@ public class EmployeeController {
      */
     @PostMapping("/status/{status}")
     @ApiOperation("启用禁用员工账号")
+    @CacheEvict(cacheNames = "employeeCache",allEntries = true)
     public Result startOrStop(@PathVariable Integer status,Long id) {
         log.info("员工状态：{}，员工id：{}",status,id);
         employeeService.startOrStop(status,id);
@@ -122,6 +128,7 @@ public class EmployeeController {
      */
     @GetMapping("/{id}")
     @ApiOperation("查询员工信息")
+    @Cacheable(cacheNames = "employeeCache",key = "#id")
     public Result<Employee> getById(@PathVariable Long id) {
         log.info("查询员工信息，员工id为{}",id);
         Employee employee =employeeService.getById(id);
@@ -134,6 +141,7 @@ public class EmployeeController {
      */
     @PutMapping
     @ApiOperation("修改员工信息")
+    @CacheEvict(cacheNames = "employeeCache",allEntries = true)
     public Result update(@RequestBody EmployeeDTO employeeDTO){
         log.info("修改员工信息{}",employeeDTO);
         employeeService.update(employeeDTO);
