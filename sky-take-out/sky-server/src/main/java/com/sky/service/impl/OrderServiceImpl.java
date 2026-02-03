@@ -425,6 +425,7 @@ public class OrderServiceImpl implements OrderService {
         orders.setId(id);
         orders.setDeliveryTime(LocalDateTime.now());
         orders.setStatus(Orders.COMPLETED);
+        log.info("订单完成：{}", orders);
         orderMapper.update(orders);
     }
 

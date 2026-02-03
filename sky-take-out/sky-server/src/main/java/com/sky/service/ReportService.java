@@ -34,4 +34,11 @@ public interface ReportService {
     OrderReportVO getOrdersStatistics(LocalDate begin, LocalDate end);
 
 
+    /**
+     * 销量排名
+     * @param begin
+     * @param end
+     * @return
+     */
+    SalesTop10ReportVO getSalesTop10(LocalDate begin, LocalDate end);
 }

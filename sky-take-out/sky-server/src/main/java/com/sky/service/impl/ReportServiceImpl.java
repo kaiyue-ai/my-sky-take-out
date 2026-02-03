@@ -1,6 +1,7 @@
 package com.sky.service.impl;
 
 import com.alibaba.druid.util.StringUtils;
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.entity.User;
 import com.sky.mapper.OrderMapper;
@@ -8,6 +9,7 @@ import com.sky.mapper.UserMapper;
 import com.sky.service.OrderService;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
@@ -187,5 +189,18 @@ public class ReportServiceImpl implements ReportService {
         //订单完成率获取
         orderReportVO.setOrderCompletionRate(orderReportVO.getValidOrderCount().doubleValue()/orderReportVO.getTotalOrderCount());
         return orderReportVO;
+    }
+
+    @Override
+    public SalesTop10ReportVO getSalesTop10(LocalDate begin, LocalDate end) {
+        SalesTop10ReportVO salesTop10ReportVO = new SalesTop10ReportVO();
+        Map map = new HashMap();
+        map.put("begin", begin);
+        map.put("end", end);
+        //获取销量top10
+        List<GoodsSalesDTO> mapList = orderMapper.getSalesTop10(map);
+        salesTop10ReportVO.setNameList(mapList.stream().map(GoodsSalesDTO::getName).collect(Collectors.joining(",")));
+        salesTop10ReportVO.setNumberList(mapList.stream().map(GoodsSalesDTO::getNumber).map(String::valueOf).collect(Collectors.joining(",")));
+        return salesTop10ReportVO;
     }
 }

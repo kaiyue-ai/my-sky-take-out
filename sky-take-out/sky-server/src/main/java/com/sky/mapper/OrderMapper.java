@@ -1,6 +1,7 @@
 package com.sky.mapper;
 
 import com.github.pagehelper.Page;
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import com.sky.vo.OrderVO;
@@ -8,7 +9,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -100,4 +103,20 @@ public interface OrderMapper {
      */
     @Select("select count(id) from orders where order_time between #{begin} and #{end} and status = #{status}")
     Integer countByDayAndStatus(Map map);
+
+    /**
+     * 根据日期查询有效订单
+     * @param map
+     * @return
+     */
+    @Select("select * from orders where order_time between #{begin} and #{end} and status = #{status}")
+    Orders getVailOrdersByDayAndStatus(Map map);
+
+
+    /**
+     * 查询销量排名的top10
+     * @param map
+     * @return
+     */
+    List<GoodsSalesDTO> getSalesTop10(Map map);
 }
