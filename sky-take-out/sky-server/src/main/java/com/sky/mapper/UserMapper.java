@@ -46,4 +46,12 @@ public interface UserMapper {
      */
     @Select("select count(id) from sky_take_out.user where create_time between #{begin} and #{end}")
     Integer countNewUserByDate(Map map);
+
+    /**
+     * 根据条件统计用户数量
+     * @param map
+     * @return
+     */
+    @Select("select count(id) from sky_take_out.user where create_time <=  #{end} and create_time >= #{begin}")
+    Integer countByMap(Map map);
 }
