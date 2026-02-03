@@ -423,6 +423,7 @@ public class OrderServiceImpl implements OrderService {
     public void complete(Long id) {
         Orders orders = new Orders();
         orders.setId(id);
+        orders.setDeliveryTime(LocalDateTime.now());
         orders.setStatus(Orders.COMPLETED);
         orderMapper.update(orders);
     }
