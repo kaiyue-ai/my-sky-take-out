@@ -14,6 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -96,4 +97,13 @@ public class ReportController {
         log.info("销量排名：{}到{}", begin, end);
         return Result.success(reportService.getSalesTop10(begin, end));
     }
+    /**
+     * 导出Excel
+     */
+    @RequestMapping("/export")
+    @ApiOperation("导出Excel运营数据报表")
+    public void export(HttpServletResponse response){
+        reportService.exportBusinessData(response);
+    }
+
 }
