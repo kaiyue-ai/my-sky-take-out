@@ -29,7 +29,7 @@ public class SetmealController {
     private SetmealService setmealService;
     @PostMapping
     @ApiOperation("新增套餐")
-    @CacheEvict(cacheNames = "setmealCache",key = "#setmealDTO.categoryId")
+    @CacheEvict(cacheNames = "setmealCache",allEntries = true)
     public Result save(@RequestBody SetmealDTO setmealDTO){
         log.info("保存套餐：{}",setmealDTO);
         setmealService.saveWithDish(setmealDTO);
@@ -38,6 +38,7 @@ public class SetmealController {
 
     @GetMapping("/page")
     @ApiOperation("分页查询")
+    @Cacheable(cacheNames = "setmealCache",key = "'page_'+#setmealPageQueryDTO")
     public Result<PageResult> page(SetmealPageQueryDTO setmealPageQueryDTO){
         log.info("分页查询：{}", setmealPageQueryDTO);
         PageResult pageResult = setmealService.page(setmealPageQueryDTO);
@@ -46,6 +47,7 @@ public class SetmealController {
 
     @GetMapping("/{id}")
     @ApiOperation("根据id查询套餐")
+    @Cacheable(cacheNames = "setmealCache",key = "'id_'+#id")
     public Result<SetmealVO> getByIdWithDish(@PathVariable Long id) {
         log.info("根据id查询套餐：{}",id);
         SetmealVO setmealVO = new SetmealVO();
