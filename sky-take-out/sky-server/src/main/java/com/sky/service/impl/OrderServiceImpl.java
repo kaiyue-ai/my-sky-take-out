@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.sky.WebSocket.WebSocketServer;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.*;
@@ -122,6 +123,8 @@ public class OrderServiceImpl implements OrderService {
     private WeChatPayUtil weChatPayUtil;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private WebSocketServer webSocketServer;
     @Override
     @Transactional
     public OrderSubmitVO submit(OrdersSubmitDTO ordersSubmitDTO) {
@@ -227,6 +230,15 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+        //通过webSocket推送消息给客户端 type orderId content
+        Map map=new HashMap();
+        map.put("type",1);//1 来单提醒 2客户催单
+        map.put("orderId",ordersDB.getId());
+        map.put("content","订单号"+outTradeNo);
+        //封装消息
+        String jsonString = JSON.toJSONString(map);
+        //发送消息
+        webSocketServer.sendToAllClient(jsonString);
     }
 
     @Override
@@ -341,6 +353,10 @@ public class OrderServiceImpl implements OrderService {
      * @return
      */
     @Override
+    /**
+     * 统计订单数据
+     * @return
+     */
     public OrderStatisticsVO statistics() {
         OrderStatisticsVO orderStatisticsVO = new OrderStatisticsVO();
         orderStatisticsVO.setToBeConfirmed(orderMapper.countStatus(Orders.TO_BE_CONFIRMED));
@@ -387,6 +403,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    /**
+     * 配送订单
+     * @param id
+     */
     public void delivery(Long id) {
         Orders orders = new Orders();
         orders.setId(id);
@@ -407,6 +427,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    /**
+     * 处理超时订单
+     * @param status
+     * @param time
+     */
     public void processTimeoutOrder(Integer status, LocalDateTime time) {
         List<Orders> ordersList = orderMapper.getByStatusAndOrderTime(status, time);
         if (ordersList != null && ordersList.size() > 0) {
@@ -424,6 +449,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    /**
+     * 处理处于派送中的订单
+     * @param deliveryInProgress
+     * @param localDateTime
+     */
     public void processDeliveryTimeoutOrder(Integer deliveryInProgress, LocalDateTime localDateTime) {
         // 查询超时订单
         List<Orders> ordersList = orderMapper.getByStatusAndOrderTime(deliveryInProgress, localDateTime);

@@ -33,6 +33,7 @@ sky:
     access-key-secret:
     bucket-name:
   shop:
-    address:
+    address: 北京市海淀区上地十街10号
   baidu:
     ak:
+
