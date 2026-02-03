@@ -112,4 +112,10 @@ public interface OrderService {
      * @param localDateTime
      */
     void processDeliveryTimeoutOrder(Integer deliveryInProgress, LocalDateTime localDateTime);
+
+    /**
+     * 催单
+     * @param id
+     */
+    void reminder(Long id);
 }
