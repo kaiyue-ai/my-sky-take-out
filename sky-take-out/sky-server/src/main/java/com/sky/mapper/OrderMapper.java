@@ -85,4 +85,19 @@ public interface OrderMapper {
      */
     Double sumByMap(Map map);
 
+    /**
+     * 根据日期统计订单数量
+     * @param map
+     * @return
+     */
+    @Select("select count(id) from orders where order_time between #{begin} and #{end}")
+    Integer countByDay(Map map);
+
+    /**
+     * 根据日期统计订单数量
+     * @param map
+     * @return
+     */
+    @Select("select count(id) from orders where order_time between #{begin} and #{end} and status = #{status}")
+    Integer countByDayAndStatus(Map map);
 }
